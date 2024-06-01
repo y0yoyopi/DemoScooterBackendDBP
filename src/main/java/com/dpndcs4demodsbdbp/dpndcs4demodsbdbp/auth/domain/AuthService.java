@@ -76,15 +76,15 @@ public class AuthService {
         }
         else {
             Tenant tenant = new Tenant();/*
-            passenger.setCreatedAt(ZonedDateTime.now());
-            passenger.setRole(Role.PASSENGER);
-            passenger.setFirstName(req.getFirstName());
-            passenger.setLastName(req.getLastName());
-            passenger.setEmail(req.getEmail());
-            passenger.setPassword(passwordEncoder.encode(req.getPassword()));
-            passenger.setPhoneNumber(req.getPhone());
-            passenger.setAvgRating(0f);
-            passenger.setTrips(0);*/
+            tenant.setCreatedAt(ZonedDateTime.now());
+            tenant.setRole(Role.PASSENGER);
+            tenant.setFirstName(req.getFirstName());
+            tenant.setLastName(req.getLastName());
+            tenant.setEmail(req.getEmail());
+            tenant.setPassword(passwordEncoder.encode(req.getPassword()));
+            tenant.setPhoneNumber(req.getPhone());
+            tenant.setAvgRating(0f);
+            tenant.setTrips(0);*/
 
             userRepository.save(tenant);
 

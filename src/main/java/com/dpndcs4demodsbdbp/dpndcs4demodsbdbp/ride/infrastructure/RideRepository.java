@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 
 public interface RideRepository extends JpaRepository<Ride, Long> {
-    Page<Ride> findAllByTenantIdAndStatus(Long passenger_id, Status status, Pageable pageable);
+    Page<Ride> findAllByTenantIdAndStatus(Long tenant_id, Status status, Pageable pageable);
 }

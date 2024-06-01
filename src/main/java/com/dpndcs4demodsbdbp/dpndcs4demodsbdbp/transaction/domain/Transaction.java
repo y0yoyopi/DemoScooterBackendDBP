@@ -2,6 +2,8 @@ package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.domain;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class Transaction {
 
@@ -11,4 +13,7 @@ public class Transaction {
 
     @Column(nullable = false)
     private Double money;
+
+    @Column(nullable = false)
+    private LocalDateTime transaction_time;
 }
