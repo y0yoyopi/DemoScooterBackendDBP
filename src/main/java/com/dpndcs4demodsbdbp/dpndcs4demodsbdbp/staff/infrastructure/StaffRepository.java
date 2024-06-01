@@ -5,7 +5,7 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.infrastructure.UserRepositor
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Driver;
+
 import java.util.List;
 
 @Transactional

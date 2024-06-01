@@ -77,7 +77,7 @@ public class AuthService {
         else {
             Tenant tenant = new Tenant();/*
             tenant.setCreatedAt(ZonedDateTime.now());
-            tenant.setRole(Role.PASSENGER);
+            tenant.setRole(Role.TENANT);
             tenant.setFirstName(req.getFirstName());
             tenant.setLastName(req.getLastName());
             tenant.setEmail(req.getEmail());
