@@ -1,6 +1,6 @@
-package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user_locations.domain;
+package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user_locationsNONECESARIO.domain;
 
-
+/*
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
@@ -42,4 +42,4 @@ public class TenantCoordinateId implements Serializable {
     public int hashCode() {
         return Objects.hash(tenantId, coordinateId);
     }
-}
+}*/

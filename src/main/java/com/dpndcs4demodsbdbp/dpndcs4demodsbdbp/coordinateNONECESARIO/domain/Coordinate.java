@@ -1,5 +1,5 @@
-package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.coordinate.domain;
-
+package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.coordinateNONECESARIO.domain;
+/*
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -32,3 +32,4 @@ public class Coordinate {
 
 
 }
+*/
