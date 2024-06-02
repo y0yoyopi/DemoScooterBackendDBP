@@ -52,7 +52,7 @@ public class ScooterController {
     @DeleteMapping("/{scooterId}")
     public ResponseEntity<String> deleteScooter(@PathVariable Long scooterId) {
         scooterService.deleteScooter(scooterId);
-        return ResponseEntity.ok("Scooter deleted successfully");
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{scooterId}/status")

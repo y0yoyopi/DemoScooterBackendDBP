@@ -22,12 +22,11 @@ public class Tenant extends User {
 
 
     //Relación de un tenant a varias transacciones
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "transaction_id", nullable = false)
-    private Transaction transaction;
+    @OneToMany(mappedBy = "transactions")
+    private List<Transaction> transactions = new ArrayList<>();
 
     //Relación de un tenant a muchos viajes
-    @OneToMany(mappedBy = "tenant")
+    @OneToMany(mappedBy = "rides")
     private List<Ride> rides = new ArrayList<>();
 
 }

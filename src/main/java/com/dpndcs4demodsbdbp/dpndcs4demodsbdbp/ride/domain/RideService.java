@@ -17,6 +17,7 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.domain.Tenant;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.exceptions.UnauthorizeOperationException;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.infrastructure.TenantRepository;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.domain.Transaction;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.infrastructure.TransactionRepository;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.infrastructure.UserRepository;
 import org.springframework.data.domain.Pageable;
 import org.modelmapper.ModelMapper;
@@ -39,20 +40,20 @@ public class RideService {
     private final ScooterRepository scooterRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final AuthorizationUtils authorizationUtils;
-    private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
     private final StaffRepository staffRepository;
     private final ParkingAreaRepository parkingAreaRepository;
 
 
     @Autowired
-    public RideService(RideRepository rideRepository, TenantRepository tenantRepository, StaffRepository staffRepository, ScooterRepository scooterRepository, AuthorizationUtils authorizationUtils, ParkingAreaRepository parkingAreaRepository,@Qualifier("userRepository") UserRepository userRepository) {
+    public RideService(RideRepository rideRepository, TransactionRepository transactionRepository, TenantRepository tenantRepository, StaffRepository staffRepository, ScooterRepository scooterRepository, AuthorizationUtils authorizationUtils, ParkingAreaRepository parkingAreaRepository,@Qualifier("userRepository") UserRepository userRepository) {
         this.rideRepository = rideRepository;
         this.tenantRepository = tenantRepository;
         this.staffRepository = staffRepository;
         this.scooterRepository = scooterRepository;
         this.authorizationUtils = authorizationUtils;
         this.parkingAreaRepository = parkingAreaRepository;
-        this.userRepository = userRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public RideResponseDto createRide(CreateRideRequestDto rideRequest) {
@@ -114,14 +115,22 @@ public class RideService {
         scooter.setStatus(ScooterStatus.AVAILABLE);
         scooterRepository.save(scooter);
 
-        double price = ride.getPrice().getAmount();
 
-        ride.getPrice().setAmount(price);
+
+        Transaction transaction = new Transaction();
+        transaction.setAmount(ride.getPrice().getAmount());
+        transaction.setRide(ride);
+        transaction.setTenant(ride.getTenant());
+        transaction.setTransactionDateTime(LocalDateTime.now());
+
+        transactionRepository.save(transaction);
+
+        ride.setPrice(transaction);
         rideRepository.save(ride);
 
         RideResponseDto response = modelMapper.map(ride, RideResponseDto.class);
         response.setStatus(Status.COMPLETED.name());
-        response.setPrice(price);
+        response.setPrice(transaction.getAmount());
 
         return response;
     }

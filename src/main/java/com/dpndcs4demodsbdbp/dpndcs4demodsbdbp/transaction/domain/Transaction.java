@@ -1,6 +1,7 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.domain;
 
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.domain.Ride;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.domain.Tenant;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,10 @@ public class Transaction {
     @OneToOne
     @JoinColumn(name = "ride_id")
     private Ride ride;
+
+    @ManyToOne
+    @JoinColumn(name = "tenant_id", nullable = false)
+    private Tenant tenant;
 
     //Getters y Setters generados por IntellIj
 
@@ -54,6 +59,14 @@ public class Transaction {
 
     public void setRide(Ride ride) {
         this.ride = ride;
+    }
+
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
     }
 }
 
