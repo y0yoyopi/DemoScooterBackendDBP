@@ -43,7 +43,7 @@ public class TenantService {
 
     public void deleteTenant(Long id) {
         // Revisa si el usuario es el mismo
-        if(!authorizationUtils.isAdminOrResourceOwner(id))
+        if(!authorizationUtils.isAdminOrStaffOrResourceOwner(id))
             throw new UnauthorizeOperationException("You do not have permission to delete this tenant");
 
         if (!tenantRepository.existsById(id))

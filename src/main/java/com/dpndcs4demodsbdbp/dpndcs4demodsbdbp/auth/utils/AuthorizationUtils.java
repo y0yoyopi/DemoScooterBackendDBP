@@ -26,8 +26,35 @@ public class AuthorizationUtils {
         if (user == null) {
             return false;
         }
+        return user.getId().equals(id) || user.getRole().equals(Role.ADMIN) ;
+    }
+
+    public boolean isAdminOrStaff() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        String role = userDetails.getAuthorities().toArray()[0].toString();
+        User user = userService.findByEmail(username, role);
+        // Verifica si el usuario es nulo
+        if (user == null) {
+            return false;
+        }
+        return user.getRole().equals(Role.ADMIN) || user.getRole().equals(Role.STAFF);
+    }
+
+    public boolean isAdminOrStaffOrResourceOwner(Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+        String role = userDetails.getAuthorities().toArray()[0].toString();
+        User user = userService.findByEmail(username, role);
+        // Verifica si el usuario es nulo
+        if (user == null) {
+            return false;
+        }
         return user.getId().equals(id) || user.getRole().equals(Role.ADMIN) || user.getRole().equals(Role.STAFF);
     }
+    
 
     public String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

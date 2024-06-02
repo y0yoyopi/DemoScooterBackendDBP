@@ -20,13 +20,13 @@ public class TenantController {
         this.tenantService = tenantService;
     }
 
-    //Obtener la información del uno mismo(tenant)
+
     @GetMapping("/me")
     public ResponseEntity<TenantSelfResponseDTO> getTenant() {
         return ResponseEntity.ok(tenantService.getTenantOwnInfo());
     }
 
-    //Eliminar la cuenta
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTenant(@PathVariable Long id) {
         tenantService.deleteTenant(id);
