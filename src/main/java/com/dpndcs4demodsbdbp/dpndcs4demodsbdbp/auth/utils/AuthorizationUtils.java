@@ -42,6 +42,8 @@ public class AuthorizationUtils {
         return user.getRole().equals(Role.ADMIN) || user.getRole().equals(Role.STAFF);
     }
 
+
+
     public boolean isAdminOrStaffOrResourceOwner(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

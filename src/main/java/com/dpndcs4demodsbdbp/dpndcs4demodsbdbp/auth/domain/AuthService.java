@@ -7,6 +7,7 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.auth.exceptions.UserAlreadyExistE
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.config.JwtService;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.domain.Staff;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.domain.Tenant;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.domain.Role;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.domain.User;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.infrastructure.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -55,18 +56,13 @@ public class AuthService {
         if (user.isPresent()) throw new UserAlreadyExistException("Email is already registered");
 
         if (req.getIsStaff()) {
-            Staff staff = new Staff();/*
-            driver.setCategory(req.getCategory());
-            driver.setVehicle(modelMapper.map(req.getVehicle(), Vehicle.class));
-            driver.setTrips(0);
-            driver.setAvgRating(0f);
-            driver.setCreatedAt(ZonedDateTime.now());
-            driver.setRole(Role.DRIVER);
-            driver.setFirstName(req.getFirstName());
-            driver.setLastName(req.getLastName());
-            driver.setEmail(req.getEmail());
-            driver.setPassword(passwordEncoder.encode(req.getPassword()));
-            driver.setPhoneNumber(req.getPhone());*/
+            Staff staff = new Staff();
+            staff.setEmail(req.getEmail());
+            staff.setPassword(passwordEncoder.encode(req.getPassword()));
+            staff.setFirstName(req.getFirstName());
+            staff.setLastName(req.getLastName());
+            staff.setRole(Role.STAFF);
+            staff.setPhoneNumber(req.getPhone());
 
             userRepository.save(staff);
 
@@ -75,16 +71,13 @@ public class AuthService {
             return response;
         }
         else {
-            Tenant tenant = new Tenant();/*
-            tenant.setCreatedAt(ZonedDateTime.now());
-            tenant.setRole(Role.TENANT);
-            tenant.setFirstName(req.getFirstName());
-            tenant.setLastName(req.getLastName());
+            Tenant tenant = new Tenant();
             tenant.setEmail(req.getEmail());
             tenant.setPassword(passwordEncoder.encode(req.getPassword()));
+            tenant.setFirstName(req.getFirstName());
+            tenant.setLastName(req.getLastName());
+            tenant.setRole(Role.TENANT);
             tenant.setPhoneNumber(req.getPhone());
-            tenant.setAvgRating(0f);
-            tenant.setTrips(0);*/
 
             userRepository.save(tenant);
 

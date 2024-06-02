@@ -10,5 +10,5 @@ import java.util.List;
 
 @Transactional
 @Repository
-public interface StaffRepository extends UserRepository<Staff> {
+public interface StaffRepository extends UserRepository<Staff>{
 }
