@@ -1,5 +1,6 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.domain;
 
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.domain.Ride;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -12,8 +13,48 @@ public class Transaction {
     private Long id;
 
     @Column(nullable = false)
-    private Double money;
+    private Double amount;
 
     @Column(nullable = false)
-    private LocalDateTime transaction_time;
+    private LocalDateTime TransactionDateTime;
+
+    @OneToOne
+    @JoinColumn(name = "ride_id")
+    private Ride ride;
+
+    //Getters y Setters generados por IntellIj
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public LocalDateTime getTransactionDateTime() {
+        return TransactionDateTime;
+    }
+
+    public void setTransactionDateTime(LocalDateTime TransactionDateTime) {
+        this.TransactionDateTime = TransactionDateTime;
+    }
+
+    public Ride getRide() {
+        return ride;
+    }
+
+    public void setRide(Ride ride) {
+        this.ride = ride;
+    }
 }
+
+
