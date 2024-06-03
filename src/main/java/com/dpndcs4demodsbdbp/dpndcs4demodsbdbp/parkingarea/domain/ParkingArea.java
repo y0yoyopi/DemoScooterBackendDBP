@@ -18,12 +18,11 @@ public class ParkingArea {
     @Column(nullable = false)
     private Double longitude;
 
-    //Relación de un ParkingArea a muchos scooters
-    @OneToMany(mappedBy = "ParkingArea")
+    // Relación de un ParkingArea a muchos scooters
+    @OneToMany(mappedBy = "parkingArea")
     private List<Scooter> scooters = new ArrayList<>();
 
-    //Constructores
-
+    // Constructores
     public ParkingArea() {}
 
     public ParkingArea(Double latitude, Double longitude) {
@@ -31,9 +30,7 @@ public class ParkingArea {
         this.longitude = longitude;
     }
 
-    //Setter and Getters
-
-
+    // Setters and Getters
     public Long getId() {
         return id;
     }

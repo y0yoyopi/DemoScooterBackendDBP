@@ -9,4 +9,6 @@ public class CreateParkingAreaRequestDto {
     private Double latitude;
     @NotNull
     private Double longitude;
+
+
 }

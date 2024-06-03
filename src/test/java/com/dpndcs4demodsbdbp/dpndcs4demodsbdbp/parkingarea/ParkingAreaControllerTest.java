@@ -1,34 +1,39 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea;
 
-
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.application.ParkingAreaController;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.domain.ParkingAreaService;
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.CreateParkingAreaRequestDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.ParkingAreaResponseDto;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.CreateParkingAreaRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Arrays;
+import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class ParkingAreaControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Mock
     private ParkingAreaService parkingAreaService;
@@ -36,70 +41,96 @@ public class ParkingAreaControllerTest {
     @InjectMocks
     private ParkingAreaController parkingAreaController;
 
+    private ParkingAreaResponseDto parkingAreaResponseDto;
+    private CreateParkingAreaRequestDto createParkingAreaRequestDto;
+
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        parkingAreaResponseDto = new ParkingAreaResponseDto();
+        parkingAreaResponseDto.setId(1L);
+        parkingAreaResponseDto.setLatitude(40.7128);
+        parkingAreaResponseDto.setLongitude(-74.0060);
+
+        createParkingAreaRequestDto = new CreateParkingAreaRequestDto();
+        createParkingAreaRequestDto.setLatitude(40.7128);
+        createParkingAreaRequestDto.setLongitude(-74.0060);
     }
 
     @Test
-    void testCreateParkingArea() {
-        CreateParkingAreaRequestDto requestDto = new CreateParkingAreaRequestDto();
-        requestDto.setLatitude(40.7128);
-        requestDto.setLongitude(-74.0060);
+    public void testCreateParkingArea() throws Exception {
+        when(parkingAreaService.createParkingArea(any(CreateParkingAreaRequestDto.class))).thenReturn(parkingAreaResponseDto);
 
-        ParkingAreaResponseDto responseDto = new ParkingAreaResponseDto();
-        responseDto.setId(1L);
-        responseDto.setLatitude(40.7128);
-        responseDto.setLongitude(-74.0060);
-
-        when(parkingAreaService.createParkingArea(any(CreateParkingAreaRequestDto.class))).thenReturn(responseDto);
-
-        ResponseEntity<ParkingAreaResponseDto> response = parkingAreaController.createParkingArea(requestDto);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1L, response.getBody().getId());
-
-        verify(parkingAreaService, times(1)).createParkingArea(any(CreateParkingAreaRequestDto.class));
+        mockMvc.perform(post("/parking-areas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"latitude\": 40.7128, \"longitude\": -74.0060}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> {
+                    ParkingAreaResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ParkingAreaResponseDto.class);
+                    assertEquals(parkingAreaResponseDto.getId(), response.getId());
+                    assertEquals(parkingAreaResponseDto.getLatitude(), response.getLatitude());
+                    assertEquals(parkingAreaResponseDto.getLongitude(), response.getLongitude());
+                });
     }
 
     @Test
-    void testGetParkingAreaById() {
-        ParkingAreaResponseDto responseDto = new ParkingAreaResponseDto();
-        responseDto.setId(1L);
-        responseDto.setLatitude(40.7128);
-        responseDto.setLongitude(-74.0060);
+    public void testGetParkingAreaById() throws Exception {
+        when(parkingAreaService.getParkingAreaById(anyLong())).thenReturn(parkingAreaResponseDto);
 
-        when(parkingAreaService.getParkingAreaById(1L)).thenReturn(responseDto);
-
-        ResponseEntity<ParkingAreaResponseDto> response = parkingAreaController.getParkingAreaById(1L);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(1L, response.getBody().getId());
-
-        verify(parkingAreaService, times(1)).getParkingAreaById(1L);
+        mockMvc.perform(get("/parking-areas/{parkingAreaId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> {
+                    ParkingAreaResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ParkingAreaResponseDto.class);
+                    assertEquals(parkingAreaResponseDto.getId(), response.getId());
+                    assertEquals(parkingAreaResponseDto.getLatitude(), response.getLatitude());
+                    assertEquals(parkingAreaResponseDto.getLongitude(), response.getLongitude());
+                });
     }
 
     @Test
-    void testGetAllParkingAreas() {
-        ParkingAreaResponseDto responseDto1 = new ParkingAreaResponseDto();
-        responseDto1.setId(1L);
-        responseDto1.setLatitude(40.7128);
-        responseDto1.setLongitude(-74.0060);
+    public void testUpdateParkingArea() throws Exception {
+        when(parkingAreaService.updateParkingArea(anyLong(), any(CreateParkingAreaRequestDto.class))).thenReturn(parkingAreaResponseDto);
 
-        ParkingAreaResponseDto responseDto2 = new ParkingAreaResponseDto();
-        responseDto2.setId(2L);
-        responseDto2.setLatitude(34.0522);
-        responseDto2.setLongitude(-118.2437);
+        mockMvc.perform(put("/parking-areas/{parkingAreaId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"latitude\": 40.7128, \"longitude\": -74.0060}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> {
+                    ParkingAreaResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ParkingAreaResponseDto.class);
+                    assertEquals(parkingAreaResponseDto.getId(), response.getId());
+                    assertEquals(parkingAreaResponseDto.getLatitude(), response.getLatitude());
+                    assertEquals(parkingAreaResponseDto.getLongitude(), response.getLongitude());
+                });
+    }
 
-        Page<ParkingAreaResponseDto> page = new PageImpl<>(Arrays.asList(responseDto1, responseDto2), PageRequest.of(0, 10), 2);
+    @Test
+    public void testDeleteParkingArea() throws Exception {
+        mockMvc.perform(delete("/parking-areas/{parkingAreaId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
 
-        when(parkingAreaService.getAllParkingAreas(any(Pageable.class))).thenReturn(page);
+    @Test
+    public void testGetAllParkingAreas() throws Exception {
+        Page<ParkingAreaResponseDto> parkingAreaPage = new PageImpl<>(Collections.singletonList(parkingAreaResponseDto), PageRequest.of(0, 10), 1);
+        when(parkingAreaService.getAllParkingAreas(any(PageRequest.class))).thenReturn(parkingAreaPage);
 
-        ResponseEntity<Page<ParkingAreaResponseDto>> response = parkingAreaController.getAllParkingAreas(PageRequest.of(0, 10));
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(2, response.getBody().getTotalElements());
-
-        verify(parkingAreaService, times(1)).getAllParkingAreas(any(Pageable.class));
+        mockMvc.perform(get("/parking-areas")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> {
+                    Page<ParkingAreaResponseDto> response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PageImpl.class);
+                    assertEquals(1, response.getTotalElements());
+                    ParkingAreaResponseDto parkingArea = response.getContent().get(0);
+                    assertEquals(parkingAreaResponseDto.getId(), parkingArea.getId());
+                    assertEquals(parkingAreaResponseDto.getLatitude(), parkingArea.getLatitude());
+                    assertEquals(parkingAreaResponseDto.getLongitude(), parkingArea.getLongitude());
+                });
     }
 }

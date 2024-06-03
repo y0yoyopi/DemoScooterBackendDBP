@@ -1,7 +1,5 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.domain;
 
-
-
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.domain.Ride;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.domain.Transaction;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.domain.User;
@@ -19,14 +17,11 @@ import java.util.List;
 @Entity
 public class Tenant extends User {
 
-
-
-    //Relación de un tenant a varias transacciones
-    @OneToMany(mappedBy = "transactions")
+    // Relación de un tenant a varias transacciones
+    @OneToMany(mappedBy = "tenant")
     private List<Transaction> transactions = new ArrayList<>();
 
-    //Relación de un tenant a muchos viajes
-    @OneToMany(mappedBy = "rides")
+    // Relación de un tenant a muchos viajes
+    @OneToMany(mappedBy = "tenant")
     private List<Ride> rides = new ArrayList<>();
-
 }

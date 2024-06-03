@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ScooterService {
@@ -24,7 +22,7 @@ public class ScooterService {
     private final AuthorizationUtils authorizationUtils;
 
     @Autowired
-    public ScooterService(ScooterRepository scooterRepository,  AuthorizationUtils authorizationUtils, ParkingAreaRepository parkingAreaRepository) {
+    public ScooterService(ScooterRepository scooterRepository, AuthorizationUtils authorizationUtils, ParkingAreaRepository parkingAreaRepository) {
         this.scooterRepository = scooterRepository;
         this.parkingAreaRepository = parkingAreaRepository;
         this.modelMapper = new ModelMapper();
@@ -47,7 +45,6 @@ public class ScooterService {
         scooter = scooterRepository.save(scooter);
         return modelMapper.map(scooter, ScooterResponseDto.class);
     }
-
 
     public ScooterResponseDto getScooterById(Long scooterId) {
         Scooter scooter = scooterRepository.findById(scooterId)
@@ -98,7 +95,6 @@ public class ScooterService {
         Scooter scooter = scooterRepository.findById(scooterId)
                 .orElseThrow(() -> new IllegalArgumentException("Scooter not found"));
 
-        // Ensure valid status transitions
         if (status == ScooterStatus.IN_USE && scooter.getStatus() != ScooterStatus.AVAILABLE) {
             throw new IllegalArgumentException("Scooter must be available to set it in use");
         }

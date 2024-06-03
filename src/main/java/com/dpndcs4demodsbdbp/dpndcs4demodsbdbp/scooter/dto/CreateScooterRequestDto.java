@@ -12,4 +12,15 @@ public class CreateScooterRequestDto {
     private Long parkingAreaId;
     @NotNull
     private ScooterStatus status;
+
+    public CreateScooterRequestDto() {
+    }
+
+    public CreateScooterRequestDto(@NotNull String model, @NotNull Long parkingAreaId, @NotNull ScooterStatus status) {
+        this.model = model;
+        this.parkingAreaId = parkingAreaId;
+        this.status = status;
+    }
+
+
 }

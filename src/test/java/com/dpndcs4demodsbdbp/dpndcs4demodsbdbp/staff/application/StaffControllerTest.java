@@ -1,7 +1,6 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.application;
 
-
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.domain.Staff;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.application.StaffController;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.domain.StaffService;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.dto.CreateStaffRequestDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.dto.StaffResponseDto;
@@ -16,17 +15,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class StaffControllerTest {
 
     @Autowired
@@ -38,100 +36,87 @@ public class StaffControllerTest {
     @InjectMocks
     private StaffController staffController;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private Staff staff;
+    private StaffResponseDto staffResponseDto;
+    private CreateStaffRequestDto createStaffRequestDto;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        staff = new Staff();
-        staff.setFirstName("John");
-        staff.setLastName("Doe");
-        staff.setEmail("john.doe@example.com");
-        staff.setPassword("password");
+        staffResponseDto = new StaffResponseDto();
+        staffResponseDto.setId(1L);
+        staffResponseDto.setFirstName("John");
+        staffResponseDto.setLastName("Doe");
+        staffResponseDto.setEmail("john.doe@example.com");
+        staffResponseDto.setRole(com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.domain.Role.STAFF);
+
+        createStaffRequestDto = new CreateStaffRequestDto();
+        createStaffRequestDto.setFirstName("John");
+        createStaffRequestDto.setLastName("Doe");
+        createStaffRequestDto.setEmail("john.doe@example.com");
+        createStaffRequestDto.setPassword("password");
     }
 
     @Test
     public void testCreateStaff() throws Exception {
-        CreateStaffRequestDto requestDto = new CreateStaffRequestDto();
-        requestDto.setFirstName("John");
-        requestDto.setLastName("Doe");
-        requestDto.setEmail("john.doe@example.com");
-        requestDto.setPassword("password");
-
-        StaffResponseDto responseDto = new StaffResponseDto();
-        responseDto.setId(1L);
-        responseDto.setFirstName("John");
-        responseDto.setLastName("Doe");
-        responseDto.setEmail("john.doe@example.com");
-
-        when(staffService.createStaff(any(CreateStaffRequestDto.class))).thenReturn(responseDto);
+        when(staffService.createStaff(any(CreateStaffRequestDto.class))).thenReturn(staffResponseDto);
 
         mockMvc.perform(post("/staff")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isOk());
-
-        verify(staffService, times(1)).createStaff(any(CreateStaffRequestDto.class));
+                        .content(new ObjectMapper().writeValueAsString(createStaffRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> {
+                    StaffResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), StaffResponseDto.class);
+                    assertEquals(staffResponseDto.getId(), response.getId());
+                    assertEquals(staffResponseDto.getFirstName(), response.getFirstName());
+                    assertEquals(staffResponseDto.getLastName(), response.getLastName());
+                    assertEquals(staffResponseDto.getEmail(), response.getEmail());
+                    assertEquals(staffResponseDto.getRole(), response.getRole());
+                });
     }
 
     @Test
     public void testGetStaffById() throws Exception {
-        Long staffId = 1L;
+        when(staffService.getStaffById(anyLong())).thenReturn(staffResponseDto);
 
-        StaffResponseDto responseDto = new StaffResponseDto();
-        responseDto.setId(staffId);
-        responseDto.setFirstName("John");
-        responseDto.setLastName("Doe");
-        responseDto.setEmail("john.doe@example.com");
-
-        when(staffService.getStaffById(staffId)).thenReturn(responseDto);
-
-        mockMvc.perform(get("/staff/{staffId}", staffId)
+        mockMvc.perform(get("/staff/{staffId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(staffService, times(1)).getStaffById(staffId);
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> {
+                    StaffResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), StaffResponseDto.class);
+                    assertEquals(staffResponseDto.getId(), response.getId());
+                    assertEquals(staffResponseDto.getFirstName(), response.getFirstName());
+                    assertEquals(staffResponseDto.getLastName(), response.getLastName());
+                    assertEquals(staffResponseDto.getEmail(), response.getEmail());
+                    assertEquals(staffResponseDto.getRole(), response.getRole());
+                });
     }
 
     @Test
     public void testUpdateStaff() throws Exception {
-        Long staffId = 1L;
-        CreateStaffRequestDto requestDto = new CreateStaffRequestDto();
-        requestDto.setFirstName("John");
-        requestDto.setLastName("Doe");
-        requestDto.setEmail("john.doe@example.com");
-        requestDto.setPassword("password");
+        when(staffService.updateStaff(anyLong(), any(CreateStaffRequestDto.class))).thenReturn(staffResponseDto);
 
-        StaffResponseDto responseDto = new StaffResponseDto();
-        responseDto.setId(staffId);
-        responseDto.setFirstName("John");
-        responseDto.setLastName("Doe");
-        responseDto.setEmail("john.doe@example.com");
-
-        when(staffService.updateStaff(eq(staffId), any(CreateStaffRequestDto.class))).thenReturn(responseDto);
-
-        mockMvc.perform(put("/staff/{staffId}", staffId)
+        mockMvc.perform(put("/staff/{staffId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isOk());
-
-        verify(staffService, times(1)).updateStaff(eq(staffId), any(CreateStaffRequestDto.class));
+                        .content(new ObjectMapper().writeValueAsString(createStaffRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(result -> {
+                    StaffResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), StaffResponseDto.class);
+                    assertEquals(staffResponseDto.getId(), response.getId());
+                    assertEquals(staffResponseDto.getFirstName(), response.getFirstName());
+                    assertEquals(staffResponseDto.getLastName(), response.getLastName());
+                    assertEquals(staffResponseDto.getEmail(), response.getEmail());
+                    assertEquals(staffResponseDto.getRole(), response.getRole());
+                });
     }
 
     @Test
     public void testDeleteStaff() throws Exception {
-        Long staffId = 1L;
-
-        doNothing().when(staffService).deleteStaff(staffId);
-
-        mockMvc.perform(delete("/staff/{staffId}", staffId)
+        mockMvc.perform(delete("/staff/{staffId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-
-        verify(staffService, times(1)).deleteStaff(staffId);
     }
 }

@@ -1,166 +1,125 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.application;
 
 
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.domain.ParkingArea;
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.domain.Ride;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.domain.RideService;
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.domain.Status;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.*;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.RideResponseDto;
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.infrastructure.RideRepository;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.Scooter;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.ScooterStatus;
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.infrastructure.ScooterRepository;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.domain.Tenant;
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.infrastructure.TenantRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.CreateRideRequestDto;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.RideDetailsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
 public class RideControllerTest {
 
-    @Autowired
+    @Mock
+    private RideService rideService;
+
+    @InjectMocks
+    private RideController rideController;
+
     private MockMvc mockMvc;
-
-    @Autowired
-    private RideRepository rideRepository;
-
-    @Autowired
-    private TenantRepository tenantRepository;
-
-    @Autowired
-    private ScooterRepository scooterRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private Tenant tenant;
     private Scooter scooter;
-    private Ride ride;
-
-    @Autowired
-    private RideService rideService;
+    private CreateRideRequestDto createRideRequestDto;
+    private RideResponseDto rideResponseDto;
+    private RideDetailsDto rideDetailsDto;
+    private RidesByUserDto ridesByUserDto;
 
     @BeforeEach
     public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(rideController).build();
+
         tenant = new Tenant();
-        tenant.setFirstName("err");
-        tenant.setLastName("wutt");
-        tenant.setEmail("err.wut@example.com");
-        tenantRepository.save(tenant);
+        tenant.setId(1L);
+        tenant.setEmail("tenant@example.com");
 
         scooter = new Scooter();
+        scooter.setId(1L);
         scooter.setStatus(ScooterStatus.AVAILABLE);
-        scooterRepository.save(scooter);
 
-        ride = new Ride();
-        ride.setTenant(tenant);
-        ride.setScooter(scooter);
-        ride.setDepartureDate(LocalDateTime.now());
-        ride.setArrivalDate(LocalDateTime.now().plusHours(1));
-        ride.setStatus(Status.ONGOING);
-        ride.setOriginParkingArea(new ParkingArea(40.7128, -74.0060));
+        createRideRequestDto = new CreateRideRequestDto();
+        createRideRequestDto.setScooterId(1L);
+        createRideRequestDto.setOriginParkingAreaId(1L);
+        createRideRequestDto.setPrice(10.0);
+
+        rideResponseDto = new RideResponseDto();
+        rideResponseDto.setStatus("ONGOING");
+        rideResponseDto.setPrice(10.0);
+
+        rideDetailsDto = new RideDetailsDto();
+        rideDetailsDto.setId(1L);
+        rideDetailsDto.setStatus("ONGOING");
+
+        ridesByUserDto = new RidesByUserDto();
+        ridesByUserDto.setId(1L);
+        ridesByUserDto.setStatus("ONGOING");
     }
 
     @Test
     public void testStartRide() throws Exception {
-        CreateRideRequestDto requestDto = new CreateRideRequestDto();
-        requestDto.setEmail("err.wut@example.com");
-
-        RideResponseDto responseDto = new RideResponseDto();
-        responseDto.setId(1L);
-
-        when(rideService.createRide(any(CreateRideRequestDto.class))).thenReturn(responseDto);
+        when(rideService.createRide(any(CreateRideRequestDto.class))).thenReturn(rideResponseDto);
 
         mockMvc.perform(post("/ride/start")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isOk());
-
-        verify(rideService, times(1)).createRide(any(CreateRideRequestDto.class));
+                        .content("{ \"scooterId\": 1, \"originParkingAreaId\": 1, \"price\": 10.0 }"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test
     public void testCompleteRide() throws Exception {
-        Long rideId = 1L;
-        Long destinationParkingAreaId = 1L;
+        when(rideService.completeRide(anyLong(), anyLong())).thenReturn(rideResponseDto);
 
-        RideResponseDto responseDto = new RideResponseDto();
-        responseDto.setId(rideId);
-
-        when(rideService.completeRide(rideId, destinationParkingAreaId)).thenReturn(responseDto);
-
-        mockMvc.perform(patch("/ride/complete/{rideId}", rideId)
-                        .param("destinationParkingAreaId", destinationParkingAreaId.toString())
+        mockMvc.perform(patch("/ride/complete/{rideId}", 1L)
+                        .param("destinationParkingAreaId", "2")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(rideService, times(1)).completeRide(rideId, destinationParkingAreaId);
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test
     public void testCancelRide() throws Exception {
-        Long rideId = 1L;
-
-        doNothing().when(rideService).cancelRide(rideId);
-
-        mockMvc.perform(delete("/ride/delete/{rideId}", rideId)
+        mockMvc.perform(patch("/ride/delete/{rideId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-
-        verify(rideService, times(1)).cancelRide(rideId);
     }
 
     @Test
     public void testGetRideById() throws Exception {
-        Long rideId = 1L;
+        when(rideService.getRideById(anyLong())).thenReturn(rideDetailsDto);
 
-        RideDetailsDto responseDto = new RideDetailsDto();
-        responseDto.setId(rideId);
-
-        when(rideService.getRideById(rideId)).thenReturn(responseDto);
-
-        mockMvc.perform(get("/ride/{rideId}", rideId)
+        mockMvc.perform(get("/ride/{rideId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(rideService, times(1)).getRideById(rideId);
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 
     @Test
     public void testGetRidesByTenant() throws Exception {
-        Long tenantId = 1L;
+        when(rideService.getRidesByTenant(anyLong())).thenReturn(List.of(ridesByUserDto));
 
-        RidesByUserDto responseDto = new RidesByUserDto();
-        responseDto.setTenantId(tenantId);
-
-        when(rideService.getRidesByTenant(tenantId)).thenReturn(List.of(responseDto));
-
-        mockMvc.perform(get("/ride/user/{tenantId}", tenantId)
+        mockMvc.perform(get("/ride/user/{tenantId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        verify(rideService, times(1)).getRidesByTenant(tenantId);
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
     }
 }

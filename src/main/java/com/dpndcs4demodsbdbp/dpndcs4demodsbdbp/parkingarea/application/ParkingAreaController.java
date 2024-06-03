@@ -1,4 +1,4 @@
-package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea;
+package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.application;
 
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.domain.ParkingAreaService;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.ParkingAreaResponseDto;
@@ -8,8 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/parking-areas")

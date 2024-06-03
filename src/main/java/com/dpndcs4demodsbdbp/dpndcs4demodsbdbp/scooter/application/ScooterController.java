@@ -1,6 +1,5 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.application;
 
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.ParkingAreaResponseDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.ScooterService;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.ScooterStatus;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.dto.CreateScooterRequestDto;
@@ -9,13 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/scooter")
@@ -53,7 +46,7 @@ public class ScooterController {
     }
 
     @DeleteMapping("/{scooterId}")
-    public ResponseEntity<String> deleteScooter(@PathVariable Long scooterId) {
+    public ResponseEntity<Void> deleteScooter(@PathVariable Long scooterId) {
         scooterService.deleteScooter(scooterId);
         return ResponseEntity.noContent().build();
     }
@@ -63,5 +56,4 @@ public class ScooterController {
         ScooterResponseDto response = scooterService.updateScooterStatus(scooterId, status);
         return ResponseEntity.ok(response);
     }
-
 }
