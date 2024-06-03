@@ -4,6 +4,8 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.domain.ParkingAreaSer
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.ParkingAreaResponseDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.CreateParkingAreaRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,8 +48,8 @@ public class ParkingAreaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ParkingAreaResponseDto>> getAllParkingAreas() {
-        List<ParkingAreaResponseDto> response = parkingAreaService.getAllParkingAreas();
+    public ResponseEntity<Page<ParkingAreaResponseDto>> getAllParkingAreas(Pageable pageable) {
+        Page<ParkingAreaResponseDto> response = parkingAreaService.getAllParkingAreas(pageable);
         return ResponseEntity.ok(response);
     }
 

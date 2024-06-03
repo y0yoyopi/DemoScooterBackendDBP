@@ -5,12 +5,14 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.domain.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 
-public interface RideRepository extends JpaRepository<Ride, Long> {
+public interface RideRepository extends JpaRepository<Ride, Long>{
     Page<Ride> findAllByTenantIdAndStatus(Long tenant_id, Status status, Pageable pageable);
 
     List<Ride> findByTenantId(Long tenantId);

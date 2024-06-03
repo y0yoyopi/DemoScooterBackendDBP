@@ -8,7 +8,3 @@ import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 }
-/*
-public interface UserRepository<T extends User> extends JpaRepository<T, Long> {
-    Optional<T> findByEmail(String email);
-}*/

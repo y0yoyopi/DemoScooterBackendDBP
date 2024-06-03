@@ -7,6 +7,7 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.CreateRideRequestDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.RideDetailsDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.RideResponseDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.dto.RidesByUserDto;
+import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.events.HelloEmailEvent;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.ride.infrastructure.RideRepository;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.Scooter;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.ScooterStatus;
@@ -19,6 +20,7 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.infrastructure.TenantRepos
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.domain.Transaction;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.transaction.infrastructure.TransactionRepository;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.infrastructure.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +45,12 @@ public class RideService {
     private final TransactionRepository transactionRepository;
     private final StaffRepository staffRepository;
     private final ParkingAreaRepository parkingAreaRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
 
 
     @Autowired
-    public RideService(RideRepository rideRepository, TransactionRepository transactionRepository, TenantRepository tenantRepository, StaffRepository staffRepository, ScooterRepository scooterRepository, AuthorizationUtils authorizationUtils, ParkingAreaRepository parkingAreaRepository,@Qualifier("userRepository") UserRepository userRepository) {
+    public RideService(RideRepository rideRepository, ApplicationEventPublisher applicationEventPublisher, TransactionRepository transactionRepository, TenantRepository tenantRepository, StaffRepository staffRepository, ScooterRepository scooterRepository, AuthorizationUtils authorizationUtils, ParkingAreaRepository parkingAreaRepository,@Qualifier("userRepository") UserRepository userRepository) {
         this.rideRepository = rideRepository;
         this.tenantRepository = tenantRepository;
         this.staffRepository = staffRepository;
@@ -54,6 +58,7 @@ public class RideService {
         this.authorizationUtils = authorizationUtils;
         this.parkingAreaRepository = parkingAreaRepository;
         this.transactionRepository = transactionRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public RideResponseDto createRide(CreateRideRequestDto rideRequest) {
@@ -95,6 +100,9 @@ public class RideService {
         RideResponseDto response = modelMapper.map(ride, RideResponseDto.class);
         response.setStatus(Status.ONGOING.name());
         response.setPrice(rideRequest.getPrice());
+
+        applicationEventPublisher.publishEvent(new HelloEmailEvent(this, rideRequest.getEmail()));
+
 
         return response;
     }

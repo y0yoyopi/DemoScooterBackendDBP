@@ -7,6 +7,8 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.infrastructure.Parkin
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.exceptions.UnauthorizeOperationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,10 +43,9 @@ public class ParkingAreaService {
         return modelMapper.map(parkingArea, ParkingAreaResponseDto.class);
     }
 
-    public List<ParkingAreaResponseDto> getAllParkingAreas() {
-        return parkingAreaRepository.findAll().stream()
-                .map(parkingArea -> modelMapper.map(parkingArea, ParkingAreaResponseDto.class))
-                .collect(Collectors.toList());
+    public Page<ParkingAreaResponseDto> getAllParkingAreas(Pageable pageable) {
+        return parkingAreaRepository.findAll(pageable)
+                .map(parkingArea -> modelMapper.map(parkingArea, ParkingAreaResponseDto.class));
     }
 
     public ParkingAreaResponseDto updateParkingArea(Long parkingAreaId, CreateParkingAreaRequestDto parkingAreaRequest) {

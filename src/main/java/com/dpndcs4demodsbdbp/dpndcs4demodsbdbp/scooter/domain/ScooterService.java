@@ -9,6 +9,8 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.infrastructure.ScooterRep
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.exceptions.UnauthorizeOperationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,10 +55,9 @@ public class ScooterService {
         return modelMapper.map(scooter, ScooterResponseDto.class);
     }
 
-    public List<ScooterResponseDto> getAllScooters() {
-        return scooterRepository.findAll().stream()
-                .map(scooter -> modelMapper.map(scooter, ScooterResponseDto.class))
-                .collect(Collectors.toList());
+    public Page<ScooterResponseDto> getAllScooters(Pageable pageable) {
+        return scooterRepository.findAll(pageable)
+                .map(scooter -> modelMapper.map(scooter, ScooterResponseDto.class));
     }
 
     public ScooterResponseDto updateScooter(Long scooterId, CreateScooterRequestDto scooterRequest) {

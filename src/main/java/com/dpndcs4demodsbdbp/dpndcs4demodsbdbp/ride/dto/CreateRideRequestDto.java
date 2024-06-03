@@ -20,4 +20,7 @@ public class CreateRideRequestDto {
     @NotNull
     @Positive
     private Double price;
+
+    private String email;
+
 }
