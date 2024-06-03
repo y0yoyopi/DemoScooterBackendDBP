@@ -1,4 +1,4 @@
-package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.application;
+package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea;
 
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.domain.ParkingAreaService;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.parkingarea.dto.ParkingAreaResponseDto;
