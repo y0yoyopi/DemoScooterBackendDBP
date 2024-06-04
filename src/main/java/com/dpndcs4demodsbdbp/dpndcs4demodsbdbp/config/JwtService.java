@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +28,7 @@ public class JwtService {
         return JWT.decode(token).getSubject();
     }
 
-    public String generateToken(UserDetails data){
+    public String generateToken(UserDetails data) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + 1000 * 60 * 60 * 10);
 
@@ -43,16 +42,13 @@ public class JwtService {
                 .sign(algorithm);
     }
 
-    public void validateToken(String token, String userEmail) throws AuthenticationException {
+    public boolean validateToken(String token, UserDetails userDetails) {
+        String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
 
-        JWT.require(Algorithm.HMAC256(secret)).build().verify(token);
-
-        UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
-
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                userDetails, token, userDetails.getAuthorities());
-        context.setAuthentication(authToken);
-        SecurityContextHolder.setContext(context);
+    private boolean isTokenExpired(String token) {
+        Date expiration = JWT.decode(token).getExpiresAt();
+        return expiration.before(new Date());
     }
 }

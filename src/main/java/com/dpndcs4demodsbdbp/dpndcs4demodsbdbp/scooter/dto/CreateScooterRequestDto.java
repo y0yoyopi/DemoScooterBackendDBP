@@ -22,5 +22,27 @@ public class CreateScooterRequestDto {
         this.status = status;
     }
 
+    public ScooterStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(ScooterStatus status) {
+        this.status = status;
+    }
+
+    public Long getParkingAreaId() {
+        return parkingAreaId;
+    }
+
+    public void setParkingAreaId(Long parkingAreaId) {
+        this.parkingAreaId = parkingAreaId;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
 }

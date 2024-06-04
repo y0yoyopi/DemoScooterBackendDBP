@@ -5,36 +5,29 @@ import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.ScooterService;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.domain.ScooterStatus;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.dto.CreateScooterRequestDto;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.scooter.dto.ScooterResponseDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 public class ScooterControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Mock
     private ScooterService scooterService;
@@ -42,102 +35,144 @@ public class ScooterControllerTest {
     @InjectMocks
     private ScooterController scooterController;
 
-    private ScooterResponseDto scooterResponseDto;
-    private CreateScooterRequestDto createScooterRequestDto;
+    private MockMvc mockMvc;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        scooterResponseDto = new ScooterResponseDto();
-        scooterResponseDto.setId(1L);
-        scooterResponseDto.setModel("Model A");
-        scooterResponseDto.setParkingAreaId(1L);
-        scooterResponseDto.setStatus(ScooterStatus.AVAILABLE);
-
-        createScooterRequestDto = new CreateScooterRequestDto();
-        createScooterRequestDto.setModel("Model A");
-        createScooterRequestDto.setParkingAreaId(1L);
-        createScooterRequestDto.setStatus(ScooterStatus.AVAILABLE);
+        mockMvc = MockMvcBuilders.standaloneSetup(scooterController).build();
     }
 
     @Test
     public void testCreateScooter() throws Exception {
-        when(scooterService.createScooter(any(CreateScooterRequestDto.class))).thenReturn(scooterResponseDto);
+        CreateScooterRequestDto requestDto = new CreateScooterRequestDto();
+        requestDto.setModel("Model A");
+        requestDto.setParkingAreaId(1L);
+        requestDto.setStatus(ScooterStatus.AVAILABLE);
+
+        ScooterResponseDto responseDto = new ScooterResponseDto();
+        responseDto.setId(1L);
+        responseDto.setModel("Model A");
+        responseDto.setParkingAreaId(1L);
+        responseDto.setStatus(ScooterStatus.AVAILABLE);
+
+        when(scooterService.createScooter(any(CreateScooterRequestDto.class))).thenReturn(responseDto);
 
         mockMvc.perform(post("/scooter")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(createScooterRequestDto)))
+                        .content("{\"model\": \"Model A\", \"parkingAreaId\": 1, \"status\": \"AVAILABLE\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> {
-                    ScooterResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ScooterResponseDto.class);
-                    assertEquals(scooterResponseDto.getId(), response.getId());
-                    assertEquals(scooterResponseDto.getModel(), response.getModel());
-                    assertEquals(scooterResponseDto.getParkingAreaId(), response.getParkingAreaId());
-                    assertEquals(scooterResponseDto.getStatus(), response.getStatus());
-                });
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.model").value("Model A"))
+                .andExpect(jsonPath("$.parkingAreaId").value(1L))
+                .andExpect(jsonPath("$.status").value("AVAILABLE"));
+
+        verify(scooterService, times(1)).createScooter(any(CreateScooterRequestDto.class));
     }
 
     @Test
     public void testGetScooterById() throws Exception {
-        when(scooterService.getScooterById(anyLong())).thenReturn(scooterResponseDto);
+        ScooterResponseDto responseDto = new ScooterResponseDto();
+        responseDto.setId(1L);
+        responseDto.setModel("Model A");
+        responseDto.setParkingAreaId(1L);
+        responseDto.setStatus(ScooterStatus.AVAILABLE);
 
-        mockMvc.perform(get("/scooter/{scooterId}", 1L)
+        when(scooterService.getScooterById(anyLong())).thenReturn(responseDto);
+
+        mockMvc.perform(get("/scooter/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> {
-                    ScooterResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ScooterResponseDto.class);
-                    assertEquals(scooterResponseDto.getId(), response.getId());
-                    assertEquals(scooterResponseDto.getModel(), response.getModel());
-                    assertEquals(scooterResponseDto.getParkingAreaId(), response.getParkingAreaId());
-                    assertEquals(scooterResponseDto.getStatus(), response.getStatus());
-                });
-    }
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.model").value("Model A"))
+                .andExpect(jsonPath("$.parkingAreaId").value(1L))
+                .andExpect(jsonPath("$.status").value("AVAILABLE"));
 
-    @Test
-    public void testUpdateScooter() throws Exception {
-        when(scooterService.updateScooter(anyLong(), any(CreateScooterRequestDto.class))).thenReturn(scooterResponseDto);
-
-        mockMvc.perform(put("/scooter/{scooterId}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(createScooterRequestDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> {
-                    ScooterResponseDto response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), ScooterResponseDto.class);
-                    assertEquals(scooterResponseDto.getId(), response.getId());
-                    assertEquals(scooterResponseDto.getModel(), response.getModel());
-                    assertEquals(scooterResponseDto.getParkingAreaId(), response.getParkingAreaId());
-                    assertEquals(scooterResponseDto.getStatus(), response.getStatus());
-                });
-    }
-
-    @Test
-    public void testDeleteScooter() throws Exception {
-        mockMvc.perform(delete("/scooter/{scooterId}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+        verify(scooterService, times(1)).getScooterById(anyLong());
     }
 
     @Test
     public void testGetAllScooters() throws Exception {
-        Page<ScooterResponseDto> scooterPage = new PageImpl<>(Collections.singletonList(scooterResponseDto), PageRequest.of(0, 10), 1);
-        when(scooterService.getAllScooters(any(PageRequest.class))).thenReturn(scooterPage);
+        ScooterResponseDto responseDto = new ScooterResponseDto();
+        responseDto.setId(1L);
+        responseDto.setModel("Model A");
+        responseDto.setParkingAreaId(1L);
+        responseDto.setStatus(ScooterStatus.AVAILABLE);
+
+        Page<ScooterResponseDto> page = new PageImpl<>(Collections.singletonList(responseDto), PageRequest.of(0, 10), 1);
+
+        when(scooterService.getAllScooters(any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/scooter")
+                        .param("page", "0")
+                        .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(result -> {
-                    Page<ScooterResponseDto> response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PageImpl.class);
-                    assertEquals(1, response.getTotalElements());
-                    ScooterResponseDto scooter = response.getContent().get(0);
-                    assertEquals(scooterResponseDto.getId(), scooter.getId());
-                    assertEquals(scooterResponseDto.getModel(), scooter.getModel());
-                    assertEquals(scooterResponseDto.getParkingAreaId(), scooter.getParkingAreaId());
-                    assertEquals(scooterResponseDto.getStatus(), scooter.getStatus());
-                });
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].model").value("Model A"))
+                .andExpect(jsonPath("$.content[0].parkingAreaId").value(1L))
+                .andExpect(jsonPath("$.content[0].status").value("AVAILABLE"));
+
+        verify(scooterService, times(1)).getAllScooters(any(Pageable.class));
+    }
+
+    @Test
+    public void testUpdateScooter() throws Exception {
+        CreateScooterRequestDto requestDto = new CreateScooterRequestDto();
+        requestDto.setModel("Model B");
+        requestDto.setParkingAreaId(1L);
+        requestDto.setStatus(ScooterStatus.IN_USE);
+
+        ScooterResponseDto responseDto = new ScooterResponseDto();
+        responseDto.setId(1L);
+        responseDto.setModel("Model B");
+        responseDto.setParkingAreaId(1L);
+        responseDto.setStatus(ScooterStatus.IN_USE);
+
+        when(scooterService.updateScooter(anyLong(), any(CreateScooterRequestDto.class))).thenReturn(responseDto);
+
+        mockMvc.perform(put("/scooter/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"model\": \"Model B\", \"parkingAreaId\": 1, \"status\": \"IN_USE\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.model").value("Model B"))
+                .andExpect(jsonPath("$.parkingAreaId").value(1L))
+                .andExpect(jsonPath("$.status").value("IN_USE"));
+
+        verify(scooterService, times(1)).updateScooter(anyLong(), any(CreateScooterRequestDto.class));
+    }
+
+    @Test
+    public void testDeleteScooter() throws Exception {
+        doNothing().when(scooterService).deleteScooter(anyLong());
+
+        mockMvc.perform(delete("/scooter/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(scooterService, times(1)).deleteScooter(anyLong());
+    }
+
+    @Test
+    public void testUpdateScooterStatus() throws Exception {
+        ScooterResponseDto responseDto = new ScooterResponseDto();
+        responseDto.setId(1L);
+        responseDto.setModel("Model A");
+        responseDto.setParkingAreaId(1L);
+        responseDto.setStatus(ScooterStatus.IN_USE);
+
+        when(scooterService.updateScooterStatus(anyLong(), any(ScooterStatus.class))).thenReturn(responseDto);
+
+        mockMvc.perform(patch("/scooter/1/status")
+                        .param("status", "IN_USE")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.model").value("Model A"))
+                .andExpect(jsonPath("$.parkingAreaId").value(1L))
+                .andExpect(jsonPath("$.status").value("IN_USE"));
+
+        verify(scooterService, times(1)).updateScooterStatus(anyLong(), any(ScooterStatus.class));
     }
 }

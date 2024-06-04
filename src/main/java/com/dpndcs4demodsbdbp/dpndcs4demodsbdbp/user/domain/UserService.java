@@ -1,8 +1,6 @@
 package com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.domain;
 
-
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.staff.infrastructure.StaffRepository;
-import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.exceptions.UnauthorizeOperationException;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.infrastructure.TenantRepository;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.user.infrastructure.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
+
     @Autowired
     private UserRepository<User> userRepository;
     @Autowired
@@ -26,16 +25,15 @@ public class UserService {
         if (role.equals("ROLE_STAFF"))
             user = staffRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         else
-            user = tenantRepository.findByEmail(username).orElseThrow(() -> new UnauthorizeOperationException("User nottt found"));
+            user = tenantRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return user;
     }
-    @Bean(name = "UserDetailsService")
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            User user = userRepository
-                    .findByEmail(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            return (UserDetails) user;
-        };
-}}
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository
+                .findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+}

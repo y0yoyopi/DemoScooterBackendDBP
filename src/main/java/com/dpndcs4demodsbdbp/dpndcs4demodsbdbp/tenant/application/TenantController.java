@@ -6,9 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.dpndcs4demodsbdbp.dpndcs4demodsbdbp.tenant.dto.PatchTenantInfoDto;
 
-import java.net.URI;
-import java.util.List;
-
 @RestController
 @RequestMapping("/tenant")
 public class TenantController {

@@ -16,4 +16,8 @@ public class PatchTenantInfoDto {
     @NotNull
     @Size(min = 9, max = 12)
     private String phoneNumber;
+
+    public PatchTenantInfoDto() {
+
+    }
 }

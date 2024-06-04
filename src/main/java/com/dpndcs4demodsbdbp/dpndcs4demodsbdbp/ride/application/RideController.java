@@ -41,7 +41,7 @@ public class RideController {
     @PatchMapping("/delete/{rideId}")
     public ResponseEntity<String> cancelRide(@PathVariable Long rideId) {
         rideService.cancelRide(rideId);
-        return ResponseEntity.ok("Ride cancelled");
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{rideId}")
